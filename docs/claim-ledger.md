@@ -10,4 +10,7 @@
 | Core flows make no automatic network requests | Offline browser request capture | User-clicked citations and hosted page retrieval use the network |
 | Static export carries the decision story | Download and print checks | Editorial candidate, not submission approval |
 
+| Mission-purpose and component controls preserve the run | Browser snapshot comparison | Presentation context, not a production platform connection |
+| Logo works offline and is included in walkthroughs | Embedded asset load check and three export inspections | User-supplied branding asset |
+
 No statement establishes government-tool integration, field performance, readiness improvement, savings or completed applicant feasibility.

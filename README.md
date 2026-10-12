@@ -16,6 +16,12 @@ Open `index.html` or `dist/index.html` directly in a browser. Both are self-cont
 
 The **Instructor** view selects benign/malicious telemetry and link variants and reveals the separate reference cause. The command case has one configured unauthorized-command variant. Local role switching is a teaching mechanism; no sensitive information belongs in this public bundle.
 
+## Mission Context And Branding
+
+Select Operations, Training or Acquisition to frame the same recorded run around a different reader question. The mission map explains the spacecraft, ground-system and crew responsibilities in each scenario. Context controls preserve the running exercise.
+
+The user-supplied Zendir logo is embedded in the site and saved walkthroughs, so branding works offline. Mission rehearsal, coordinated anomaly response and connected simulation concepts draw on Zendir’s public platform pages; see `docs/design-sources.md`.
+
 ## What The Model Represents
 
 Each step is 30 configured seconds, each run ends at 180 seconds, and the link recovery contact is 90–150 seconds. These synthetic teaching parameters demonstrate evidence timing and choices. They are not customer mission values, predictive physics or measured performance. There is no actual government cyber-tool connector, live spacecraft command, deployed Proof Labs integration, response-effect probability or readiness score.

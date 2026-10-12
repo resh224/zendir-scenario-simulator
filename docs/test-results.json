@@ -10,6 +10,8 @@
   "pageErrors": [],
   "automaticNetworkRequests": [],
   "checks": [
+    "embedded logo",
+    "mission context controls preserve run",
     "role views",
     "decision evidence snapshot",
     "invalid alternative",

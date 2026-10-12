@@ -1,0 +1,46 @@
+# Zendir Mission Decision Lab
+
+**When Telemetry Alone Is Insufficient**
+
+An alert starts the investigation. This public browser demonstration follows the crew decision and configured mission consequence across unreliable telemetry, unauthorized commands and impaired command and control.
+
+## Run The Simulator
+
+Open `index.html` or `dist/index.html` directly in a browser. Both are self-contained and work offline. No installation, account or server is required.
+
+1. Select a case and a crew view. Press **Step +30 s** to start, then advance the evidence clock, or use **Play**.
+2. Read source and receipt times. Enter a rationale and choose an available response. A required check or contact window can prevent an action.
+3. Switch crew views to examine different evidence. Record a note for both teams.
+4. Finish the run and open **Debrief & Compare**. An alternative keeps the same configuration and decision time without changing the original.
+5. Save a static HTML walkthrough or JSON run record. Open a saved record to reconstruct it from the bundled fixtures. **Print View** prints the selected live or debrief view.
+
+The **Instructor** view selects benign/malicious telemetry and link variants and reveals the separate reference cause. The command case has one configured unauthorized-command variant. Local role switching is a teaching mechanism; no sensitive information belongs in this public bundle.
+
+## What The Model Represents
+
+Each step is 30 configured seconds, each run ends at 180 seconds, and the link recovery contact is 90–150 seconds. These synthetic teaching parameters demonstrate evidence timing and choices. They are not customer mission values, predictive physics or measured performance. There is no actual government cyber-tool connector, live spacecraft command, deployed Proof Labs integration, response-effect probability or readiness score.
+
+The telemetry pair shares an initial indication but has different reference states. A correction can preserve a maliciously displaced pointing state or disturb an otherwise healthy state. The command flow separates route containment from alternate-route restoration. The link pair preserves old source times and limits recovery to the configured contact.
+
+Notes stay in memory. A file export includes them only when requested. Reloading or resetting clears the current run. Reference links open only after a user chooses them; the simulator makes no automatic network requests.
+
+## Build And Check
+
+Requires Node.js for development only:
+
+```text
+node scripts/build.mjs
+node --test tests/engine.test.cjs
+```
+
+The build emits identical root and dist entry files. The public GitHub Pages site serves the root file from `main`.
+
+The optional browser suite uses Playwright and an installed Chrome executable. Make Playwright available to Node, set `ZENDIR_TEST_BROWSER` to the browser executable when different from the macOS Chrome default, and run `node tests/browser.test.cjs`. `ZENDIR_TEST_OUTPUT` selects the QA output directory. The suite runs with browser networking disabled.
+
+## Delivery And Submission
+
+Public site: https://resh224.github.io/zendir-scenario-simulator/
+
+This repository contains only the synthetic executable, source, tests and operating documentation. Proposal drafts and company evidence remain in the private proposal repository. Static examples are in `docs/walkthroughs/`.
+
+The demonstration is separate from the SBIR submission. Executable or external-link evaluation permission remains a current-solicitation input. A selected static walkthrough must fit inside the technical proposal’s page limit; these examples do not add pages or establish completed D2P2 feasibility.

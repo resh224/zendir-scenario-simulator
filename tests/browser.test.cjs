@@ -1,0 +1,54 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const {pathToFileURL}=require('node:url');
+const {chromium}=require('playwright');
+(async()=>{
+ const browser=await chromium.launch({headless:true,executablePath:process.env.ZENDIR_TEST_BROWSER||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+ const context=await browser.newContext({offline:true,acceptDownloads:true,viewport:{width:1440,height:1000}});
+ const page=await context.newPage(),errors=[],requests=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))requests.push(r.url());});
+ const root=path.resolve(__dirname,'..'),out=process.env.ZENDIR_TEST_OUTPUT||'/private/tmp/zendir-simulator-qa';fs.mkdirSync(out,{recursive:true});
+ await page.goto(pathToFileURL(path.join(root,'dist/index.html')).href);
+ await page.screenshot({path:path.join(out,'desktop.png'),fullPage:true});
+ assert.equal(await page.locator('h1').innerText(),'When Telemetry Alone\nIs Insufficient');
+ assert.equal(await page.locator('#truth').isVisible(),false);
+ await page.locator('#step').click();await page.locator('[data-action="hold"]').click();
+ const early=await page.evaluate(()=>ZendirUI.snapshot().actions[0].evidenceIds);
+ for(let i=0;i<6;i++)await page.locator('#step').click();
+ assert.equal(await page.locator('#status').textContent(),'Complete');
+ assert.deepEqual(await page.evaluate(()=>ZendirUI.snapshot().actions[0].evidenceIds),early);
+ await page.locator('#debrief-tab').click();await page.locator('#alternative').selectOption('correct');
+ // Early correction is unavailable in the alternative, too.
+ await page.locator('#compare').click();assert.match(await page.locator('#message').innerText(),/required evidence/);
+ await page.evaluate(()=>{ZendirUI.reset('telemetry','malicious');ZendirUI.command({type:'start'});ZendirUI.command({type:'step'});ZendirUI.command({type:'step'});ZendirUI.command({type:'action',option:'hold',role:'operator',rationale:'Reference is off target; comparing two choices.'});for(let i=0;i<4;i++)ZendirUI.command({type:'step'});});
+ await page.locator('#debrief-tab').click();await page.locator('#alternative').selectOption('correct');await page.locator('#compare').click();
+ assert.match(await page.locator('#comparison').innerText(),/observation preserved/);
+ const before=await page.evaluate(()=>ZendirUI.snapshot());await page.locator('#replay').click();assert.deepEqual(await page.evaluate(()=>ZendirUI.snapshot()),before);
+ await page.screenshot({path:path.join(out,'debrief.png'),fullPage:true});
+ await page.evaluate(()=>ZendirUI.reset('telemetry','benign'));await page.locator('#step').click();
+ await page.locator('#note').fill('<img src=x onerror=alert(1)>');await page.locator('#add-note').click();assert.equal(await page.locator('#notes img').count(),0);assert.match(await page.locator('#notes').innerText(),/<img/);
+ await page.locator('#role').selectOption('instructor');assert(await page.locator('#truth').isVisible());assert(await page.locator('[data-action="hold"]').isDisabled());await page.locator('#role').selectOption('operator');assert(!(await page.locator('#truth').isVisible()));
+ await page.locator('[data-case="command"]').click();await page.locator('#step').click();await page.locator('#step').click();await page.locator('#role').selectOption('cyber');await page.locator('[data-action="contain"]').click();
+ assert.match(await page.locator('#mission-state').innerText(),/isolated/);await page.locator('#step').click();await page.locator('#step').click();await page.locator('#role').selectOption('operator');await page.locator('[data-action="restore"]').click();assert.match(await page.locator('#mission-state').innerText(),/Alternate route available/);
+ await page.locator('[data-case="link"]').click();assert.equal(await page.locator('#clock').innerText(),'T+000 s');assert.equal((await page.evaluate(()=>ZendirUI.snapshot())).actions.length,0);
+ await page.locator('#step').click();await page.locator('#step').click();await page.locator('#step').click();assert(!((await page.locator('#evidence').innerText()).includes('Delayed Telemetry')));
+ await page.locator('#step').click();assert.match(await page.locator('#evidence').innerText(),/Source T\+015 s \/ Received T\+090 s/);await page.locator('[data-action="recover"]').click();
+ await page.locator('#note').fill('<script>window.bad=true</script>');await page.locator('#add-note').click();await page.locator('#debrief-tab').click();assert.equal(await page.locator('#decision-records script').count(),0);const download=page.waitForEvent('download');await page.locator('#export-html').click();const file=await download;await file.saveAs(path.join(out,'downloaded-walkthrough.html'));
+ const jsonDownload=page.waitForEvent('download');await page.locator('#export-json').click();const json=await jsonDownload;await json.saveAs(path.join(out,'run.json'));
+ const saved=JSON.parse(fs.readFileSync(path.join(out,'run.json'),'utf8'));await page.locator('#reset').click();await page.locator('#import').setInputFiles(path.join(out,'run.json'));await page.waitForFunction(()=>ZendirUI.snapshot().actions.some(a=>a.option==='recover'));
+ assert.equal((await page.evaluate(()=>ZendirUI.snapshot())).time,saved.run.time);
+ for(const caseId of ['telemetry','command','link']){
+  await page.evaluate(id=>{ZendirUI.reset(id,'malicious');ZendirUI.setRole('operator');ZendirUI.command({type:'start'});for(let i=0;i<3;i++)ZendirUI.command({type:'step'});if(id==='command'){ZendirUI.command({type:'action',option:'contain',role:'cyber',rationale:'Contain the suspect route.'});ZendirUI.command({type:'action',option:'restore',role:'operator',rationale:'Use the checked alternate route.'});}else ZendirUI.command({type:'action',option:id==='telemetry'?'correct':'recover',role:'operator',rationale:'Use the received reference or contact evidence.'});while(ZendirUI.snapshot().time<180)ZendirUI.command({type:'step'});},caseId);
+  fs.writeFileSync(path.join(out,caseId+'-walkthrough.html'),await page.evaluate(()=>ZendirUI.walkthrough()));
+ }
+ await page.locator('#debrief-tab').click();await page.emulateMedia({media:'print'});await page.pdf({path:path.join(out,'print-view.pdf'),format:'Letter',margin:{top:'0.6in',bottom:'0.6in',left:'0.6in',right:'0.6in'},printBackground:true});await page.emulateMedia({media:'screen'});
+ await page.setViewportSize({width:390,height:844});await page.locator('#reset').click();await page.screenshot({path:path.join(out,'mobile.png'),fullPage:true});
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth));
+ await page.keyboard.press('Tab');assert.notEqual(await page.evaluate(()=>document.activeElement.tagName),'BODY');
+ await page.locator('#live-tab').focus();await page.keyboard.press('ArrowRight');assert.equal(await page.locator('#debrief-tab').getAttribute('aria-selected'),'true');
+ fs.writeFileSync(path.join(out,'invalid.json'),JSON.stringify({format:'wrong'}));const stable=await page.evaluate(()=>ZendirUI.snapshot());await page.locator('#import').setInputFiles(path.join(out,'invalid.json'));await page.waitForFunction(()=>document.getElementById('message').textContent.includes('Could not open run'));assert.deepEqual(await page.evaluate(()=>ZendirUI.snapshot()),stable);
+ assert.deepEqual(errors,[]);assert.deepEqual(requests,[]);
+ fs.writeFileSync(path.join(out,'browser-results.json'),JSON.stringify({result:'PASS',browser:browser.version(),offline:true,scenarios:3,viewports:[1440,390],pageErrors:errors,automaticNetworkRequests:requests,checks:['role views','decision evidence snapshot','invalid alternative','alternative outcome','stable replay','safe notes','command containment and restoration','delayed link evidence','contact recovery','static download','run export/import','print output','mobile overflow','keyboard focus']},null,2));
+ console.log('PASS: three offline browser flows, replay, alternatives, notes, imports/exports, print, mobile and keyboard checks; zero page errors or network requests.');await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});

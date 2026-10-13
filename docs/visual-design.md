@@ -4,6 +4,10 @@ Updated October 13, 2026. This presentation retains the existing synthetic scena
 
 The diagram reads only the current role's visible evidence and recorded crew actions. It does not reveal the hidden scenario cause before that cause becomes available through evidence or debrief. Its illustration is not a physics simulation, packet capture, or indication of measured throughput. Mission changes remain governed by the existing engine. Visual replay pauses the exercise and replays only the illustration; it does not create an action or advance simulation time. Reduced-motion preferences disable motion while retaining the state and text descriptions.
 
+## Scene callouts
+
+Evidence and command labels retain an upright orientation along their motion paths. A popup explains received evidence with source and receipt times, then reflects recorded crew choices and the endpoint. Spacecraft, ground, crew and flow hotspots offer more detail without changing the run. Callouts use only the selected role’s visible evidence and recorded actions. Dismissal lasts until the next exercise step or role change; manual hotspot selections remain open until closed. The close button and Escape dismiss the popup, with focus returned when needed. On narrow screens the popup sits below the diagram.
+
 ## Corporate color source
 
 Colors were read from [Zendir's public website](https://zendir.io/) and its [theme stylesheet](https://zendir.io/hubfs/hub_generated/template_assets/1/210426157599/1778232363661/template_theme-overrides.min.css) on October 13, 2026:

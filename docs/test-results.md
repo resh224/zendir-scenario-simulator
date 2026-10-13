@@ -1,6 +1,6 @@
 # Test results
 
-Tested October 13, 2026: all 15 engine tests passed. The expanded offline Chrome suite passed all three scenario flows, corporate palette and embedded watercolor checks, animation play/pause, visual replay without run mutation, matched initial views without early cause disclosure, route containment/restoration graphics, delayed evidence graphics, reduced-motion support, and the existing role, evidence-snapshot, alternative, replay, notes, import/export, print, mobile overflow, and keyboard checks.
+Tested October 13, 2026: all 19 engine tests passed. The expanded offline Chrome suite passed all six scenario flows, corporate palette and embedded watercolor checks, animation play/pause, visual replay without run mutation, matched initial views without early cause disclosure, route containment/restoration graphics, delayed evidence graphics, reduced-motion support, and the existing role, evidence-snapshot, alternative, replay, notes, import/export, print, mobile overflow, and keyboard checks.
 
 The callout revision also passed upright-label, automatic evidence explanation, delayed source/receipt timing, hotspot state-preservation, close-button focus return, Escape dismissal and mobile callout checks. Scene click handlers are restricted to case-selection buttons so callout interactions cannot reset a run.
 
@@ -9,3 +9,7 @@ Browser page errors: zero. Automatic HTTP/HTTPS requests: zero. Tested viewport 
 These checks cover the public synthetic teaching application. They do not establish spacecraft physics fidelity, actual government-tool integration, training improvement, or completed D2P2 feasibility. Other browser families and customer reader trials were not tested.
 
 The crew/fault revision passed active-role state preservation and focus, received evidence instruments, delayed crew handoffs, instructor-only compatible fault injection, gated recovery, unresolved endpoint, replay, alternate comparison, and simulator-panel branding checks. The encrypted-gate suite passed all six normalized email labels, wrong-password and unlisted-label rejection, lock/reload, sandboxed simulator interaction and JSON export, and mobile overflow. Encryption is a presentation gate; these tests do not establish verified email ownership or confidentiality of the public development repository.
+
+The v9 revision verifies all six benign/malicious starting pairs, twelve family/comparison replay/reset records, unnecessary correction under false telemetry, early/late antenna recovery, combined partial/full recovery and immutable execution-effect snapshots. Browser checks cover six scenario flows, scenario-menu selection, benign setup, debrief effects, removed duplicate logos, mobile layout and existing keyboard controls. The published access page continues to use the existing six email labels and shared password.
+
+Simplification checks verify the Space Cyber Garage name, closed secondary panels at startup, scenario menu and role buttons, expandable tools, all six flows, live/debrief evidence and static exports. Print opens evidence records for output and restores their screen state afterward.

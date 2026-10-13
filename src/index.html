@@ -24,7 +24,13 @@
 <g id="command-packet" class="command-packet"><rect x="-6" y="-6" width="12" height="12" rx="3"/></g>
 <g id="blocked-route" transform="translate(395 130)"><circle r="17"/><path d="M-7-7L7 7M7-7L-7 7"/></g>
 </svg><div class="scene-key"><span><i></i>Received evidence</span><span><i></i>Command path</span><span>Illustrative motion</span></div>
-</div>
+<div class="scene-hotspots" aria-label="Explore the animated mission">
+<button data-callout="spacecraft" aria-label="Explain the spacecraft" aria-controls="scene-callout" aria-expanded="false">1</button>
+<button data-callout="ground" aria-label="Explain ground systems" aria-controls="scene-callout" aria-expanded="false">2</button>
+<button data-callout="crew" aria-label="Explain the crew decision" aria-controls="scene-callout" aria-expanded="false">3</button>
+<button data-callout="flow" aria-label="Explain the evidence flow" aria-controls="scene-callout" aria-expanded="false">?</button>
+</div></div>
+<aside id="scene-callout" class="scene-callout" aria-labelledby="callout-title" hidden><button id="close-callout" aria-label="Close mission callout">×</button><div aria-live="polite"><p class="eyebrow">WHAT’S HAPPENING</p><h4 id="callout-title"></h4><p id="callout-copy"></p></div></aside>
 <div class="scene-narration" aria-live="polite"><span id="visual-number">01</span><div><h4 id="visual-title">Start with an uncertain observation</h4><p id="visual-copy">Press Play or Step to reveal evidence as it reaches the crew.</p></div></div>
 <ol class="visual-steps"><li data-visual-step="0"><span>01</span>Receive evidence</li><li data-visual-step="1"><span>02</span>Check across systems</li><li data-visual-step="2"><span>03</span>Record a crew choice</li><li data-visual-step="3"><span>04</span>Review the consequence</li></ol>
 <div class="visual-replay-controls"><button id="visual-replay">↻ Watch this visual step</button><span>Replays the illustration without changing the exercise clock or crew choices.</span></div><div class="evidence-age" id="visual-evidence"></div>

@@ -20,6 +20,8 @@ The **Instructor** view selects benign/malicious telemetry and link variants and
 
 The watercolor mission scene follows the same exercise clock and crew decisions. Play animates evidence moving through the mission; containment blocks the suspect command route and restoration reveals the alternate. The timing strip preserves source and receipt times, including delayed observations. **Watch this visual step** pauses the exercise and repeats the illustration without changing the run. Motion is illustrative, and reduced-motion preferences are respected. Static walkthroughs include the watercolor and a snapshot of the current explanation.
 
+Popup callouts explain arriving evidence, recorded choices and mission consequences as the run advances. Select the numbered spacecraft, ground and crew markers or the question mark for details. Close a callout with its × button or Escape. Opening a callout preserves the exercise clock and decisions.
+
 The palette follows Zendir’s public corporate website: lavender, electric blue, deep blue, charcoal, and pale surfaces. Asset generation details and the exact prompt are recorded in `docs/visual-design.md`.
 
 ## Mission Context And Branding

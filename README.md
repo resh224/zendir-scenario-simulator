@@ -16,6 +16,12 @@ Open `index.html` or `dist/index.html` directly in a browser. Both are self-cont
 
 The **Instructor** view selects benign/malicious telemetry and link variants and reveals the separate reference cause. The command case has one configured unauthorized-command variant. Local role switching is a teaching mechanism; no sensitive information belongs in this public bundle.
 
+## Animated Mission View
+
+The watercolor mission scene follows the same exercise clock and crew decisions. Play animates evidence moving through the mission; containment blocks the suspect command route and restoration reveals the alternate. The timing strip preserves source and receipt times, including delayed observations. **Watch this visual step** pauses the exercise and repeats the illustration without changing the run. Motion is illustrative, and reduced-motion preferences are respected. Static walkthroughs include the watercolor and a snapshot of the current explanation.
+
+The palette follows Zendir’s public corporate website: lavender, electric blue, deep blue, charcoal, and pale surfaces. Asset generation details and the exact prompt are recorded in `docs/visual-design.md`.
+
 ## Mission Context And Branding
 
 Select Operations, Training or Acquisition to frame the same recorded run around a different reader question. The mission map explains the spacecraft, ground-system and crew responsibilities in each scenario. Context controls preserve the running exercise.

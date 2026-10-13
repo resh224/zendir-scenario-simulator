@@ -1,7 +1,7 @@
-# Test Results
+# Test results
 
-Tested October 12, 2026: 12 engine tests passed. Three scenario browser walkthroughs passed in Chrome with networking disabled, including embedded logo rendering, mission-purpose and component controls that preserve the run, role visibility, preserved decision evidence, invalid choices, stable replay, branch comparison, markup-safe live/debrief notes, command containment/restoration, delayed link evidence, contact recovery, file download/import, invalid-file rejection, keyboard tabs and focus, desktop/mobile layout and print export. Browser page errors: zero. Automatic HTTP/HTTPS requests: zero.
+Tested October 13, 2026: all 12 engine tests passed. The expanded offline Chrome suite passed all three scenario flows, corporate palette and embedded watercolor checks, animation play/pause, visual replay without run mutation, matched initial views without early cause disclosure, route containment/restoration graphics, delayed evidence graphics, reduced-motion support, and the existing role, evidence-snapshot, alternative, replay, notes, import/export, print, mobile overflow, and keyboard checks.
 
-Desktop (1440 pixels wide), mobile (390 pixels wide) and debrief screenshots were visually reviewed. Print-view output was generated for layout review. The fixture behavior is the object of these tests; no real spacecraft or government tool was exercised. Customer reader trials and other browser families have not been tested.
+Browser page errors: zero. Automatic HTTP/HTTPS requests: zero. Tested viewport widths: 1440 and 390 pixels. Desktop, mobile, and mission-theater screenshots were visually inspected. Static walkthrough examples were regenerated with the watercolor and current-step explanation.
 
-Branding revision: the supplied logo renders at its original 366-pixel natural width and is embedded in both published HTML and all three saved walkthrough examples. The three scenario exports include mission context. No automatic asset requests occur.
+These checks cover the public synthetic teaching application. They do not establish spacecraft physics fidelity, actual government-tool integration, training improvement, or completed D2P2 feasibility. Other browser families and customer reader trials were not tested.

@@ -58,3 +58,29 @@ test('Seek requests coordination without fabricating a sensor reading',()=>{
 test('Alternative preserves earlier evidence-seeking time',()=>{
  let r=action(start(),'seek');r=at(r,60);r=action(r,'hold');r=at(r,180);const b=E.alternative(r,'correct','operator');assert.equal(b.actions[0].time,0);assert.equal(b.actions[1].time,60);assert.deepEqual(b.actions[1].evidenceIds,r.actions[1].evidenceIds);
 });
+
+test('Crew handoff keeps source evidence and arrives after the send time',()=>{
+ let r=E.reduce(E.create('command'),{type:'start'});r=E.reduce(r,{type:'step'});
+ assert.throws(()=>E.reduce(r,{type:'share',role:'operator',evidenceId:'provenance'}),/received/);
+ r=E.reduce(r,{type:'share',role:'cyber',evidenceId:'provenance'});
+ assert.equal(E.visible(r,'operator').some(e=>e.id==='handoff-1'),false);
+ r=E.reduce(r,{type:'step'});const h=E.visible(r,'operator').find(e=>e.id==='handoff-1');
+ assert.equal(h.sourceTime,5);assert.equal(h.receiptTime,60);assert.equal(h.parentEvent,'provenance');assert.equal(h.artifact.kind,'Authorization audit');
+ assert.deepEqual(E.replay(r),r);
+});
+test('Fault injection is instructor-controlled, changes state and gates recovery',()=>{
+ let r=E.reduce(E.create('link'),{type:'start'});
+ assert.throws(()=>E.reduce(r,{type:'inject',role:'operator',fault:'communications'}),/Instructor/);
+ assert.throws(()=>E.reduce(r,{type:'inject',role:'instructor',fault:'malicious'}),/compatible/);
+ r=E.reduce(r,{type:'inject',role:'instructor',fault:'communications'});
+ assert.match(r.mission.link,/Lost/);assert.throws(()=>E.reduce(r,{type:'action',role:'operator',option:'resolve-fault'}),/check/);
+ assert.throws(()=>E.reduce(r,{type:'inject',role:'instructor',fault:'antenna'}),/Recover/);
+ r=E.reduce(r,{type:'step'});r=E.reduce(r,{type:'action',role:'operator',option:'resolve-fault'});
+ assert.equal(r.faults[0].resolved,true);assert.deepEqual(E.replay(r),r);
+ const prior=r;const branch=E.alternative(r,'hold','operator');assert.equal(branch.faults.length,1);assert.equal(branch.faults[0].resolved,false);assert.match(branch.result,/unresolved/);assert.deepEqual(r,prior);
+});
+test('Unresolved inject survives endpoint and reset clears faults and handoffs',()=>{
+ let r=E.reduce(E.create('command'),{type:'start'});r=E.reduce(r,{type:'inject',role:'instructor',fault:'malicious'});
+ for(let i=0;i<6;i++)r=E.reduce(r,{type:'step'});
+ assert.match(r.result,/unresolved/);assert.equal(E.create().faults.length,0);assert.equal(E.create().handoffs.length,0);
+});

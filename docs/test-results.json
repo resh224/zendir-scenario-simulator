@@ -10,6 +10,12 @@
   "pageErrors": [],
   "automaticNetworkRequests": [],
   "checks": [
+    "active role banner and focus",
+    "crew handoff and delayed delivery",
+    "fictional evidence instruments",
+    "instructor fault injection and recovery",
+    "fault replay",
+    "simulator panel logo",
     "upright evidence label",
     "callout actions preserve run",
     "automatic evidence callout",

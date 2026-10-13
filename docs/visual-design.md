@@ -33,3 +33,9 @@ Generation prompt:
 ## Alignment and limits
 
 The experience illustrates an Earth-observation mission under uncertain evidence. It separates spacecraft and cyber crew views, preserves delayed observations, makes containment and recovery separate choices, and retains decision-time evidence for replay and alternative comparison. These are the proposed demonstration's teaching concepts. Actual government DCW integration, model validation, mission-authorized procedures, customer parameters, and measured training benefits remain outside this public flow demonstration. No proposal text or private evidence is included in this repository.
+
+## Crew exchange and controlled faults
+
+Active Crew View changes the evidence/actions and SVG crew emphasis while preserving the run. A recorded handoff animates from sender to recipient; the original observation time and artifact remain attached, with a 30-second configured delivery delay. Instructor injects are compatible with each scenario and introduce observations, mission state changes and a delayed recovery check. The debrief identifies inject type/time and recovery status. Sample telemetry, command queues, authorization audits, configuration traces and link/contact displays use original fictional values with asset, record and configuration references. They illustrate the evidence interfaces described in the authorized Volume 2 and feasibility documents, not completed tool integration or real exercise data.
+
+The simulator panel includes the supplied Zendir logo. The encrypted entry page also uses that logo and the corporate palette. The password and proposal originals are excluded from publication.

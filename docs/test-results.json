@@ -2,7 +2,7 @@
   "result": "PASS",
   "browser": "155.0.8059.40",
   "offline": true,
-  "scenarios": 3,
+  "scenarios": 6,
   "viewports": [
     1440,
     390
@@ -10,12 +10,17 @@
   "pageErrors": [],
   "automaticNetworkRequests": [],
   "checks": [
+    "six v9 scenario families",
+    "Space Cyber Garage name",
+    "secondary tools collapsed by default",
+    "benign family selector",
+    "execution effects in debrief",
     "active role banner and focus",
     "crew handoff and delayed delivery",
     "fictional evidence instruments",
     "instructor fault injection and recovery",
     "fault replay",
-    "simulator panel logo",
+    "duplicate header and panel logos removed",
     "upright evidence label",
     "callout actions preserve run",
     "automatic evidence callout",

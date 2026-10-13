@@ -36,11 +36,12 @@
       actions:[{id:'seek',label:'Seek More Evidence',description:'Ask the cyber and spacecraft teams to correlate the gap.'},{id:'hold',label:'Hold Until Fresh Evidence',description:'Defer a recovery action and preserve the current configuration.'},{id:'recover',label:'Use The Configured Recovery Path',description:'Attempt recovery during the configured contact.',requires:'contact',window:[90,150]}]
     }
   };
+  (typeof module!=='undefined'?require('./scenario-library.js'):scope.ZendirScenarios)(scenarios,observation);
   const faultTypes={
-    communications:{label:'Communications lost',cases:['link'],symptom:'No fresh acknowledgment',field:'link',state:'Lost; recovery check pending',check:'The configured contact and backup link pass the recovery check.'},
-    malicious:{label:'Malicious command',cases:['command'],symptom:'Unexpected command queued',field:'command',state:'Unexpected command held at execution gate',check:'An authorization review finds no approved record for the queued command.'},
-    telemetry:{label:'Telemetry corruption',cases:['telemetry'],symptom:'Telemetry integrity warning',field:'pointing',state:'Conflicting reports; current pointing unconfirmed',check:'An independent pointing source is available for a report-integrity comparison.'},
-    antenna:{label:'Antenna pointing fault',cases:['link'],symptom:'Tracking link degraded',field:'link',state:'Degraded tracking; antenna check pending',check:'The antenna check confirms a configured pointing fault; the recovery alignment is available.'}
+    communications:{label:'Communications lost',cases:['link','antenna'],symptom:'No fresh acknowledgment',field:'link',state:'Lost; recovery check pending',check:'The configured contact and backup link pass the recovery check.'},
+    malicious:{label:'Malicious command',cases:['command','combined'],symptom:'Unexpected command queued',field:'command',state:'Unexpected command held at execution gate',check:'An authorization review finds no approved record for the queued command.'},
+    telemetry:{label:'Telemetry corruption',cases:['telemetry','deception','combined'],symptom:'Telemetry integrity warning',field:'pointing',state:'Conflicting reports; current pointing unconfirmed',check:'An independent pointing source is available for a report-integrity comparison.'},
+    antenna:{label:'Antenna pointing fault',cases:['link','antenna'],symptom:'Tracking link degraded',field:'link',state:'Degraded tracking; antenna check pending',check:'The antenna check confirms a configured pointing fault; the recovery alignment is available.'}
   };
   // Original teaching fixtures. Values illustrate evidence shape, not customer telemetry.
   function artifact(event,variant){
@@ -48,9 +49,9 @@
       pointing:{kind:'Telemetry panel',asset:'SV-01 / ADCS',fields:[['Reported error','2.4 deg'],['Independent state','Not received']],samples:[0.1,0.2,2.4,2.4],log:'ADCS_REPORT pointing_error=2.4 deg; integrity=unconfirmed'},
       alert:{kind:'Cyber ticket',asset:'SV-01 / monitor',fields:[['Ticket','DEMO-017'],['Status','Investigate'],['Confidence','Unspecified']],log:'MONITOR anomaly=pointing_mismatch; recommendation=investigate'},
       reference:{kind:'Independent pointing check',asset:'SV-01 / reference',fields:[['Reference error',variant==='benign'?'0.1 deg':'2.4 deg'],['Comparison','Separate observation']],log:'REFERENCE_CHECK source=independent; units=deg'},
-      configuration:{kind:'Configuration audit',asset:'SV-01 / ADCS config',fields:[['Matching change',variant==='benign'?'Not found':'Present'],['Review','Correlate with pointing']],log:variant==='benign'?'AUDIT no matching change in this fixture':'AUDIT config_write ref=CFG-042; source_time=T+035 s'},
+      configuration:{kind:'Configuration audit',asset:'SV-01 / ADCS config',fields:[['Change authorization',variant==='benign'?'Approved calibration':'Unauthorized'],['Review','Correlate with pointing']],log:variant==='benign'?'AUDIT no matching change in this fixture':'AUDIT config_write ref=CFG-042; source_time=T+035 s'},
       queue:{kind:'Command queue',asset:'GS-01 → SV-01',fields:[['Command','ATTITUDE_SET'],['Queue state','Held'],['Authorization','Not yet checked']],log:'QUEUE cmd=ATTITUDE_SET; execution=HELD; plan_match=UNCONFIRMED'},
-      provenance:{kind:'Authorization audit',asset:'GS-01 / command gateway',fields:[['Route','Primary / suspect'],['Approved record','Not found']],log:'AUTH_CHECK cmd=ATTITUDE_SET; approved_record=NONE'},
+      provenance:{kind:'Authorization audit',asset:'GS-01 / command gateway',fields:[['Route','Primary / suspect'],['Approved record',variant==='benign'?'Present':'Not found']],log:'AUTH_CHECK cmd=ATTITUDE_SET; approved_record='+(variant==='benign'?'PRESENT':'NONE')},
       receipt:{kind:'Spacecraft acknowledgment',asset:'SV-01 / command receiver',fields:[['Receipt','Acknowledged'],['Execution','Held by gate']],log:'ACK cmd=ATTITUDE_SET; received=YES; executed=NO'},
       alternate:{kind:'Route verification',asset:'GS-02 / alternate gateway',fields:[['Route check','Passed'],['Availability','Ready after containment']],log:'ROUTE_CHECK alternate=PASS; suspect_route_must_be_isolated=YES'},
       gap:{kind:'Communications panel',asset:'GS-01 ↔ SV-01',fields:[['Fresh ACK','Unavailable'],['Telemetry age','Check source time']],samples:[12,11,6,2],log:'LINK fresh_ack=NO; current_spacecraft_state=UNKNOWN'},
@@ -65,7 +66,7 @@
   function create(caseId='telemetry',variant='malicious',id='run-001',parent=null) {
     if (!scenarios[caseId] || !scenarios[caseId].truth[variant]) throw Error('Unknown case or variant.');
     const definition=scenarios[caseId];
-    return {id,parent,caseId,variant,configuration:`synthetic-${caseId}-${variant}-1`,origin:'Synthetic scenario records; deterministic teaching rules',time:0,status:'Ready',faults:[],handoffs:[],events:definition.events(variant).map((e,i)=>({...e,artifact:artifact(e,variant),sequence:i+1,runId:id,simulationTime:e.receiptTime})),journal:[],log:[],actions:[],notes:[],mission:clone(definition.initial),result:'No decision recorded',procedure:[],coordination:[]};
+    return {id,parent,caseId,variant,configuration:`v9-demo-${caseId}-${variant}-1`,origin:'Synthetic scenario records; deterministic teaching rules',time:0,status:'Ready',faults:[],handoffs:[],events:definition.events(variant).map((e,i)=>({...e,artifact:e.artifact||artifact(e,variant),sequence:i+1,runId:id,simulationTime:e.receiptTime})),journal:[],log:[],actions:[],notes:[],mission:clone(definition.initial),result:'No decision recorded',procedure:[],coordination:[]};
   }
   function visible(run,role,time=run.time) {
     if(!roles.includes(role)) throw Error('Unknown role.');
@@ -94,16 +95,20 @@
       run.events.push(observation(`shared-${run.actions.length}`,run.time,run.time+30,both,'Shared Crew Check','The teams share the request and its rationale. This communication does not replace a missing sensor observation.'));
       const e=run.events[run.events.length-1];Object.assign(e,{sequence:run.events.length,runId:run.id,simulationTime:e.receiptTime});
     } else if(option==='hold') {run.result=run.caseId==='telemetry'?'Current state held. The final observation depends on the actual pointing state.':'Crew holds the current configuration while uncertainty remains.';run.procedure.push('The crew deferred a state change.');}
-    else if(option==='correct') {run.mission.pointing=run.variant==='malicious'?'Configured correction returns pointing on target':'Configured correction moves the already healthy reference state off target';run.result='Correction applied. Debrief compares the resulting pointing state with the separate reference.';run.procedure.push('Configured correction applied after the reference check.');}
+    else if(option==='correct') {run.mission.pointing=run.variant==='malicious'&&run.caseId!=='deception'?'Configured correction returns pointing on target':'Configured correction moves the already healthy reference state off target';run.result='Correction applied. Debrief compares the resulting pointing state with the separate reference.';run.procedure.push('Configured correction applied after the reference check.');}
     else if(option==='contain') {run.mission.command='Suspect route isolated; alternate not yet enabled';run.result='Queued command blocked. The suspect command path is unavailable.';run.procedure.push('Suspect route contained; command availability must be restored separately.');}
     else if(option==='restore') {run.mission.command='Alternate route available; suspect route isolated';run.result='Control restored through the configured alternate route.';run.procedure.push('Alternate route selected after its check and containment.');}
+    else if(option==='realign'){run.mission.link='Tracking restored through checked alignment';run.mission.command='Uplink available after alignment recovery';run.result='Tracking and commanding restored. A missed collection is not recovered by realignment.';run.procedure.push('Antenna alignment recovery applied during contact.');}
     else if(option==='recover') {run.mission.link='Recovery path available';run.mission.command='Acknowledgment available through recovery path';run.result='Recovery completed during the configured contact window.';run.procedure.push('Configured recovery used within the available contact.');}
   }
   function finish(run) {
     if(run.caseId==='telemetry') {
       const corrected=run.actions.some(a=>a.option==='correct');const onTarget=run.variant==='malicious'?corrected:!corrected;
       run.mission.pointing=onTarget?'Reference state on target':'Reference state off target';run.mission.opportunity=onTarget?'Configured observation preserved':'Configured observation missed';run.result=`${run.mission.opportunity}. ${corrected?'A correction changed the reference state.':'The crew left the reference state unchanged.'}`;
-    } else if(run.caseId==='command') {run.mission.opportunity=run.actions.some(a=>a.option==='restore')?'Control path available for the next mission decision':'Command review or route recovery still required';}
+    } else if(run.caseId==='deception'){const changed=run.actions.some(a=>a.option==='correct');run.mission.pointing=changed?'Reference moved off target by unnecessary correction':'Reference remains on target';run.mission.opportunity=changed?'Configured observation missed':'Configured observation preserved';run.result=run.mission.opportunity+'. Independent pointing and telemetry integrity address different questions.';
+    } else if(run.caseId==='antenna'){const recovery=run.actions.find(a=>a.option==='realign');run.mission.opportunity=recovery?(recovery.time<=120?'Configured collection preserved':'Earlier collection missed; tracking recovered later'):'Tracking remained degraded; configured collection missed';run.result=run.mission.opportunity+'. Recovery restores contact; reset restores the exercise starting state.';
+    } else if(run.caseId==='combined'){const corrected=run.actions.some(a=>a.option==='correct'),contained=run.actions.some(a=>a.option==='contain'),restored=run.actions.some(a=>a.option==='restore');const onTarget=run.variant==='malicious'?corrected:!corrected;const commandOK=run.variant==='malicious'?restored:!contained||restored;const late=run.actions.filter(a=>['correct','restore'].includes(a.option)).some(a=>a.time>120);run.mission.pointing=onTarget?'Reference on target':'Reference off target';run.mission.opportunity=onTarget&&commandOK?(late?'Mission function restored; earlier collection missed':'Configured collection preserved'):'Residual pointing or command-path degradation';run.result=run.mission.opportunity+'. Review ground containment, command recovery and onboard state separately.';
+    } else if(run.caseId==='command') {run.mission.opportunity=run.actions.some(a=>a.option==='restore')?'Control path available for the next mission decision':run.variant==='benign'&&!run.actions.some(a=>a.option==='contain')?'Authorized route preserved; planned collection available':'Command review or route recovery still required';}
     else {run.mission.opportunity=run.actions.some(a=>a.option==='recover')?'Recovery contact used':'Recovery contact passed without a configured recovery';}
     const active=run.faults.find(f=>!f.resolved);if(active){run.mission[active.field]=active.state;run.mission.opportunity='Residual injected fault requires recovery';run.result='The run ended with an unresolved injected fault. Mission recovery is incomplete.';}
     run.status='Complete';
@@ -117,8 +122,8 @@
       case 'stop':if(!['Running','Paused'].includes(run.status))throw Error('Only an active run can stop.');run.status='Complete';run.result='Exercise stopped before the configured endpoint; no final mission outcome inferred.';break;
       case 'action':{
         const why=reason(run,command.option,command.role);if(why)throw Error(why);
-        const record={id:`decision-${run.actions.length+1}`,runId:run.id,role:command.role,actor:command.role,option:command.option,time:run.time,simulationTime:run.time,sourceTime:run.time,receiptTime:run.time,sequence:run.events.length+run.actions.length+1,visibility:both,type:'decision',evidenceIds:visible(run,command.role).map(e=>e.id),rationale:String(command.rationale||'No rationale entered').slice(0,2000),preconditionResult:'Met'};
-        run.actions.push(record);run.log.push(clone(record));consequence(run,command.option);break;
+        const record={id:`decision-${run.actions.length+1}`,runId:run.id,role:command.role,actor:command.role,option:command.option,time:run.time,simulationTime:run.time,sourceTime:run.time,receiptTime:run.time,sequence:run.events.length+run.actions.length+1,visibility:both,type:'decision',evidenceIds:visible(run,command.role).map(e=>e.id),rationale:String(command.rationale||'No rationale entered').slice(0,2000),preconditionResult:'Met',executionStatus:'Executed in the synthetic model',missionBefore:clone(run.mission)};
+        run.actions.push(record);consequence(run,command.option);record.missionAfter=clone(run.mission);record.effect=run.result;run.log.push(clone(record));break;
       }
       case 'inject':{
         const f=faultTypes[command.fault];
@@ -130,7 +135,7 @@
         run.faults.push({id,type:command.fault,label:f.label,time:run.time,checkId,field:f.field,state:f.state,previous:run.mission[f.field],resolved:false});
         run.mission[f.field]=f.state;run.result='An injected disturbance changes the mission state. Crews must investigate its observations.';
         const event=observation(id,run.time,run.time,both,f.symptom,'An injected exercise disturbance affects this asset. The symptom alone does not establish its cause.');
-        const check=observation(checkId,run.time+15,run.time+30,both,'Fault Recovery Check',f.check);
+        const check={...observation(checkId,run.time+15,run.time+30,both,'Fault Recovery Check',f.check),parentEvent:id};
         for(const e of [event,check]){Object.assign(e,{sequence:run.events.length+1,runId:run.id,simulationTime:e.receiptTime,artifact:{kind:'Injected exercise observation',asset:run.caseId==='telemetry'?'SV-01 / ADCS':'GS-01 / mission link',fields:[['State',e===event?'Investigate':'Recovery check received']],log:e.text}});run.events.push(e);}
         deliver(run);break;
       }

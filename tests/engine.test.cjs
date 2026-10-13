@@ -4,10 +4,10 @@ const E=require('../src/engine.js');
 const start=(id='telemetry',v='malicious')=>E.reduce(E.create(id,v),{type:'start'});
 const at=(run,time)=>{while(run.time<time)run=E.reduce(run,{type:'step'});return run;};
 const action=(run,option,role='operator')=>E.reduce(run,{type:'action',option,role,rationale:'Synthetic test decision'});
-test('Three independent cases and paired starting symptoms',()=>{
- assert.equal(Object.keys(E.scenarios).length,3);
- for(const id of ['telemetry','link'])assert.deepEqual(E.visible(start(id,'benign'),'operator'),E.visible(start(id,'malicious'),'operator'));
- assert.throws(()=>E.create('unknown'));assert.throws(()=>E.create('command','benign'));
+test('Six scenario families with paired starting symptoms',()=>{
+ assert.equal(Object.keys(E.scenarios).length,6);
+ for(const id of Object.keys(E.scenarios))assert.deepEqual(E.visible(start(id,'benign'),'operator'),E.visible(start(id,'malicious'),'operator'));
+ assert.throws(()=>E.create('unknown'));assert(E.create('command','benign'));
 });
 test('Role visibility and delayed evidence preserve source and receipt times',()=>{
  let r=at(start('link'),60);assert(!E.visible(r,'operator').some(e=>e.id==='delayed'));
@@ -83,4 +83,19 @@ test('Unresolved inject survives endpoint and reset clears faults and handoffs',
  let r=E.reduce(E.create('command'),{type:'start'});r=E.reduce(r,{type:'inject',role:'instructor',fault:'malicious'});
  for(let i=0;i<6;i++)r=E.reduce(r,{type:'step'});
  assert.match(r.result,/unresolved/);assert.equal(E.create().faults.length,0);assert.equal(E.create().handoffs.length,0);
+});
+
+test('Manipulated telemetry makes an unnecessary correction harm either comparison',()=>{
+ for(const v of ['benign','malicious']){const held=at(action(at(start('deception',v),60),'hold'),180),corrected=at(action(at(start('deception',v),60),'correct'),180);assert.match(held.mission.opportunity,/preserved/);assert.match(corrected.mission.opportunity,/missed/);assert.deepEqual(E.replay(corrected),corrected);}
+});
+test('Antenna recovery restores access but preserves evidence of a missed collection',()=>{
+ assert.throws(()=>action(at(start('antenna'),60),'realign'),/not open/);
+ const early=at(action(at(start('antenna'),90),'realign'),180),late=at(action(at(start('antenna'),150),'realign'),180);assert.match(early.result,/preserved/);assert.match(late.result,/missed/);assert.match(late.mission.link,/restored/);assert.deepEqual(E.replay(late),late);
+});
+test('Combined incident needs both command and onboard recovery',()=>{
+ let r=at(start('combined'),90);r=action(r,'contain','cyber');r=action(r,'restore');const partial=at(r,180);assert.match(partial.result,/Residual/);r=action(r,'correct');const full=at(r,180);assert.match(full.result,/preserved/);assert.deepEqual(E.replay(full),full);
+ const benign=at(action(start('combined','benign'),'hold'),180);assert.match(benign.result,/preserved/);
+});
+test('All twelve family/comparison runs retain immutable execution records and reset',()=>{
+ for(const id of Object.keys(E.scenarios))for(const v of ['benign','malicious']){let r=action(at(start(id,v),90),'hold');const recorded=structuredClone(r.actions[0]);r=at(r,180);assert.deepEqual(r.actions[0],recorded);assert.equal(recorded.executionStatus,'Executed in the synthetic model');assert.deepEqual(E.replay(r),r);assert.equal(E.create(id,v).actions.length,0);assert.equal(E.create(id,v).time,0);}
 });

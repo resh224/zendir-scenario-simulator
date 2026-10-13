@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 let html=fs.readFileSync(path.join(root,'src/index.html'),'utf8');
-for(const [marker,file] of [['STYLES','styles.css'],['ENGINE','engine.js'],['APP','views.js']])html=html.replace(`/* ${marker} */`,()=>fs.readFileSync(path.join(root,'src',file),'utf8'));
+for(const [marker,file] of [['LIBRARY','scenario-library.js'],['STYLES','styles.css'],['ENGINE','engine.js'],['APP','views.js']])html=html.replace(`/* ${marker} */`,()=>fs.readFileSync(path.join(root,'src',file),'utf8'));
 const logo='data:image/webp;base64,'+fs.readFileSync(path.join(root,'assets/zendir.webp')).toString('base64');
 html=html.replaceAll('__ZENDIR_LOGO__',logo).replaceAll('__MISSION_WATERCOLOR__','data:image/jpeg;base64,'+fs.readFileSync(path.join(root,'assets/mission-watercolor.jpg')).toString('base64'));
 // The clear QA build is ignored by Git and never part of the Pages publication.

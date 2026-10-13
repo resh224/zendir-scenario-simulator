@@ -39,3 +39,11 @@ The experience illustrates an Earth-observation mission under uncertain evidence
 Active Crew View changes the evidence/actions and SVG crew emphasis while preserving the run. A recorded handoff animates from sender to recipient; the original observation time and artifact remain attached, with a 30-second configured delivery delay. Instructor injects are compatible with each scenario and introduce observations, mission state changes and a delayed recovery check. The debrief identifies inject type/time and recovery status. Sample telemetry, command queues, authorization audits, configuration traces and link/contact displays use original fictional values with asset, record and configuration references. They illustrate the evidence interfaces described in the authorized Volume 2 and feasibility documents, not completed tool integration or real exercise data.
 
 The simulator panel includes the supplied Zendir logo. The encrypted entry page also uses that logo and the corporate palette. The password and proposal originals are excluded from publication.
+
+## V9 revision
+
+The scenario menu follows `docs/v9-scenario-coverage.md`. Three mission threads continue to organize the animation. Selected families add original evidence instruments, learning goals and recovery paths, with benign comparisons across all six. Uplink commands and downlink evidence are labeled separately. Action records preserve execution status and the immediate effect at decision time. Duplicate branding in the inner header and active-role panel was removed.
+
+## Interface simplification
+
+Space Cyber Garage is the page, access and export title. A single grouped menu replaces the thread tabs and six-card gallery. One set of crew buttons replaces the duplicate role dropdown. Instructor fault controls, briefing, mission context, state/timing, notes and record/export controls use expandable panels. Only the newest evidence record opens by default. The hero and active-role banner are smaller, the redundant progress strip is hidden and uplink/downlink labels remain visible. Collapsed tools retain their underlying state.
